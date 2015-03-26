@@ -1,0 +1,133 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using LeagueSharp;
+using LeagueSharp.Common;
+using SharpDX;
+
+
+namespace ConsoleApplication1
+{
+    class Program
+    {
+
+        public static List<Spell> SpellList = new List<Spell>();
+
+    
+
+        public static List<Obj_SpellMissile> SkillShots = new List<Obj_SpellMissile>();
+
+        public static SpellSlot IgniteSlot;
+
+        public static Spell Spear, Aegis, Heartseeker, Skyfall;
+
+
+
+        private static String championName = "Pantheon";
+        public static Obj_AI_Hero Player;
+        private static Menu _Menu;
+        private static Orbwalking.Orbwalker _Orbwalker;
+        private static Spell Q, W, E, R;
+
+
+
+        static void Main(string[] args)
+        {
+            CustomEvents.Game.OnGameLoad += Game_OnGameload;
+        }
+
+        static void Game_OnGameload(EventArgs args)
+        {
+            Player = ObjectManager.Player;
+            if (Player.ChampionName != championName)
+            { return; }
+
+            Game.PrintChat(" Pantheon Yüklendi!.");
+
+
+
+            Q = new Spell(SpellSlot.Q, 620f);
+            W = new Spell(SpellSlot.W, 620f);
+            E = new Spell(SpellSlot.E, 640f);
+            R = new Spell(SpellSlot.R, 2000f);
+
+
+            SpellList.Add(Q);
+            SpellList.Add(W);
+            SpellList.Add(E);
+            SpellList.Add(R);
+
+            var orbwalkerMenu = new Menu(" Orbwalker ", "kpantheon.orbwalker", true);
+            _Menu = new Menu("Kingdom Pantheon", "kpantheon", true);
+            _Orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
+            _Menu.AddSubMenu(orbwalkerMenu);
+
+            TargetSelector.AddToMenu(_Menu);
+
+           
+           
+            var combomenu = new Menu(" Combo !", "kpantheon.combo", true);
+
+            {
+                combomenu.AddItem(new MenuItem("kpantheon.combo.useq", "Use Q").SetValue(true));
+                combomenu.AddItem(new MenuItem("kpantheon.combo.usew", "Use W").SetValue(true));
+                combomenu.AddItem(new MenuItem("kpantheon.combo.usee", " Use E ").SetValue(true));
+                combomenu.AddItem(new MenuItem("kpantheon.combo.active", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
+            }
+
+            _Menu.AddSubMenu(combomenu);
+
+            _Menu.AddToMainMenu();
+        }
+
+
+        private static void Game_OnGameUpdate(EventArgs args)
+        {
+            _Orbwalker.SetAttack(true);
+            if (Config.Item("ComboActive").GetValue<KeyBind>().Active)
+            {
+                Combo();
+            }
+
+        }
+
+        private static void Combo()
+        {
+            var targetQ = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+            var targetW = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
+            var targetE = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
+
+            if (_Menu.Item("kpantheon.combo.usew").GetValue<bool>())
+            {
+                if (Geometry.Distance(Player, targetW) <= W.Range && W.IsReady())
+                { W.Cast(targetW, true); }
+            }
+
+
+             if (_Menu.Item("kpantheon.combo.usee").GetValue<bool>())
+          {
+
+            if (Geometry.Distance(Player, targetE) <= E.Range && E.IsReady())
+            {  E.Cast(targetE, true); }
+            
+         }
+      
+          if (_Menu.Item("kpantheon.combo.useq").GetValue<bool>())
+            {
+            if (Geometry.Distance(Player, targetQ) <= Q.Range && Q.IsReady())
+            {
+                Q.Cast(targetQ, true);
+            }
+            }
+        
+        
+        
+        
+        
+        }
+   
+    
+    
+    }
+}
