@@ -59,7 +59,7 @@ namespace ConsoleApplication1
             SpellList.Add(R);
 
             var orbwalkerMenu = new Menu(" Orbwalker ", "kpantheon.orbwalker", true);
-            _Menu = new Menu("Kingdom Pantheon", "kpantheon", true);
+            _Menu = new Menu("Pantheon", "kpantheon", true);
             _Orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
             _Menu.AddSubMenu(orbwalkerMenu);
 
